@@ -106,6 +106,69 @@ class SphereSurface:
             length = self.pixel_lengths[y]
             self.surface[y, self.pixel_offsets[y]:self.pixel_offsets[y]+length] = value
 
+    def get_min_max(self):
+        """
+        Returns the minimum and maximum pixel values on the surface.
+        """
+        mn = None
+        mx = None
+        for y in range(np.round(self.equator_length/2).astype(int)):
+            length = self.pixel_lengths[y]
+            row = self.surface[y, self.pixel_offsets[y]:self.pixel_offsets[y]+length]
+            row_min = row.min()
+            row_max = row.max()
+            if mn is None or row_min < mn:
+                mn = row_min
+            if mx is None or row_max > mx:
+                mx = row_max
+        return mn, mx
+    
+    def get(self, lon, lat):
+        """
+        Get the pixel value at the specified longitude and latitude.
+        """
+        longitude = lon % np.round(self.equator_length/2).astype(int)
+        if lat < self.pixel_offsets[longitude]:
+            end_lat = self.pixel_offsets[longitude] + self.pixel_lengths[longitude]
+            negative_offset = self.pixel_offsets[longitude] - lat
+            latitude = end_lat - negative_offset
+        elif lat >= self.pixel_offsets[longitude] + self.pixel_lengths[longitude]:
+            latitude = ((lat - self.pixel_offsets[longitude]) % self.pixel_lengths[longitude]) + self.pixel_offsets[longitude]
+        else:
+            latitude = lat
+        return self.surface[longitude, latitude]
+    
+    def set(self, lon, lat, value):
+        """
+        Get the pixel value at the specified longitude and latitude.
+        """
+        longitude = lon % np.round(self.equator_length/2).astype(int)
+        if lat < self.pixel_offsets[longitude]:
+            end_lat = self.pixel_offsets[longitude] + self.pixel_lengths[longitude]
+            negative_offset = self.pixel_offsets[longitude] - lat
+            latitude = end_lat - negative_offset
+        elif lat >= self.pixel_offsets[longitude] + self.pixel_lengths[longitude]:
+            latitude = ((lat - self.pixel_offsets[longitude]) % self.pixel_lengths[longitude]) + self.pixel_offsets[longitude]
+        else:
+            latitude = lat
+        self.surface[longitude, latitude] = value
+
+    def square_filter(self, lon, lat, size):
+        """
+        Applies a square filter of given size centered at (lon, lat).
+        Returns the average value within the square.
+        """
+        half_size = size // 2
+        total = 0
+        count = 0
+        for dlon in range(-half_size, half_size + 1):
+            for dlat in range(-half_size, half_size + 1):
+                if (lon + dlon) < 0 or (lon + dlon) > self.equator_length/2:
+                    continue
+                total += self.get(lon + dlon, lat + dlat)
+                count += 1
+        return total // count
+
 # Example usage:
 # sphere = SphereSurface(512)
 # rectangle = sphere.to_rectangle()
