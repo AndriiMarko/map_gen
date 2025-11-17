@@ -52,7 +52,7 @@ class SphereSurface:
         Stretches a latitude row to the target length by duplicating pixels.
         """
         current_length = len(srs_row)
-        print(f"Stretching from {current_length} to {target_length}")
+        #print(f"Stretching from {current_length} to {target_length}")
         stratched_row = np.zeros(target_length, dtype=srs_row.dtype)
         elements_set = 0
         for i in range(current_length):
@@ -165,7 +165,7 @@ class SphereSurface:
             for dlat in range(-half_size, half_size + 1):
                 if (lon + dlon) < 0 or (lon + dlon) > self.equator_length/2:
                     continue
-                total += self.get(lon + dlon, lat + dlat)
+                total += int(self.get(lon + dlon, lat + dlat))
                 count += 1
         return total // count
 
