@@ -3,6 +3,9 @@ import numpy as np
 class End_of_aray(Exception):
     pass
 
+def get_opposite(dir_str):
+    opposites = {'N':'S', 'S':'N', 'E':'W', 'W':'E', 'NE':'SW', 'SW':'NE', 'NW':'SE', 'SE':'NW'}
+    return opposites.get(dir_str.upper(), dir_str)
 
 class SphereSurface:
     def __init__(self, equator_length):

@@ -4,12 +4,13 @@ from PIL import Image
 import time
 
 class Plate:
-    def __init__(self, plate_id, latitude, longitude, plate_type, growth_rate):
+    def __init__(self, plate_id, latitude, longitude, plate_type, growth_rate, movement_direction):
         self.plate_id = plate_id
         self.latitude = latitude
         self.longitude = longitude
         self.plate_type = plate_type  # 'continental' or 'oceanic'
         self.growth_rate = growth_rate
+        self.movement_direction = movement_direction
         self.points = set()   # Holds all points belonging to this plate
         self.borders = set()  # Holds border points for this plate
         self.old_borders = set()  # Holds border points for this plate
@@ -28,14 +29,17 @@ class TectonicPlates:
         return longitude, latitude
 
     def _init_plates(self, num_continental, num_oceanic, growth_rate_range):
+        directions = ['N', 'S', 'E', 'W', 'NE', 'NW', 'SE', 'SW']
         for i in range(num_continental):
             lon, lat = self._random_point()
             growth_rate = np.random.randint(1, growth_rate_range)
-            self.plates.append(Plate(i + 1, lat, lon, 'continental', growth_rate))
+            movement_direction = np.random.choice(directions)
+            self.plates.append(Plate(i + 1, lat, lon, 'continental', growth_rate, movement_direction))
         for i in range(num_oceanic):
             lon, lat = self._random_point()
             growth_rate = np.random.randint(1, growth_rate_range)
-            self.plates.append(Plate(num_continental + i + 1, lat, lon, 'oceanic', growth_rate))
+            movement_direction = np.random.choice(directions)
+            self.plates.append(Plate(num_continental + i + 1, lat, lon, 'oceanic', growth_rate, movement_direction))
 
     def draw_plates(self):
         surface = self.surface.surface
